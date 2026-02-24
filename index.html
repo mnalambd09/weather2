@@ -1,28 +1,21 @@
---- START OF FILE index.html ---
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আল্ট্রা-প্রো ওয়েদার অ্যাপ (V2)</title>
-    
-    <!-- External Libraries -->
+    <title>আল্ট্রা-প্রো ওয়েদার অ্যাপ</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
+        /* Dynamic Backgrounds */
         body {
-            display: flex; flex-direction: column; align-items: center;
+            display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px 0;
             background-size: cover; background-position: center; transition: background 1s ease;
         }
-
-        /* Dynamic Backgrounds */
         .bg-day-clear { background: linear-gradient(to right, #56CCF2, #2F80ED); }
         .bg-night-clear { background: linear-gradient(to right, #141E30, #243B55); }
         .bg-clouds { background: linear-gradient(to right, #7F7FD5, #86A8E7, #91EAE4); }
@@ -32,58 +25,80 @@
         .bg-thunder { background: linear-gradient(to right, #373B44, #4286f4); }
 
         .card {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            padding: 25px; border-radius: 30px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.3); width: 95%; max-width: 550px;
-            text-align: center; color: #ffffff; margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 30px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3); width: 95%; max-width: 480px;
+            text-align: center; color: #ffffff; max-height: 95vh; overflow-y: auto; position: relative;
         }
+        
+        .card::-webkit-scrollbar { width: 5px; }
+        .card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.5); border-radius: 10px; }
 
-        /* Header & Toggle */
+        /* Top Header (Title + Toggle) */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .unit-toggle { display: flex; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        
+        .unit-toggle { display: flex; background: rgba(0,0,0,0.2); border-radius: 20px; overflow: hidden; }
         .unit-toggle button {
-            background: none; border: none; color: white; padding: 8px 15px; cursor: pointer;
+            background: none; border: none; color: white; padding: 5px 15px; cursor: pointer;
             font-size: 14px; font-weight: 600; transition: 0.3s;
         }
         .unit-toggle button.active { background: #ff6b6b; }
 
-        /* Search & Favorites */
-        .search-area { margin-bottom: 15px; }
-        .search { display: flex; justify-content: center; margin-bottom: 10px; }
+        /* Search Box */
+        .search { display: flex; justify-content: center; margin-bottom: 20px; }
         .search input {
             padding: 12px 15px; border: none; border-radius: 25px 0 0 25px; outline: none;
-            width: 70%; font-size: 15px; background: rgba(255, 255, 255, 0.9); color: #333;
+            width: 70%; font-size: 15px; background: rgba(255, 255, 255, 0.9); color: #333; font-weight: 500;
         }
         .search button {
             padding: 12px 20px; border: none; background: #ff6b6b; color: #fff;
-            border-radius: 0 25px 25px 0; cursor: pointer; transition: 0.3s;
+            border-radius: 0 25px 25px 0; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.3s;
         }
-        .fav-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; margin-top: 5px; }
-        .favorites-list { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
-        .fav-city { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 10px; font-size: 12px; cursor: pointer; }
+        .search button:hover { background: #ff4757; }
 
-        /* UI Elements */
-        .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff;
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .date-time { font-size: 14px; font-weight: 400; margin-bottom: 10px; opacity: 0.9; }
         
-        .temp { font-size: 70px; font-weight: 700; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
-        .weather-icon { width: 120px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        /* Weather Icon Animation */
+        #weather-icon { width: 130px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-        /* Grid System */
-        .pro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .pro-box { background: rgba(0, 0, 0, 0.15); padding: 12px 5px; border-radius: 15px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .pro-box i { display: block; font-size: 18px; margin-bottom: 5px; color: #ffeb3b; }
-        .pro-box b { display: block; font-size: 14px; margin-top: 3px; }
+        .weather-info { display: none; }
+        .weather-info h2 { font-size: 32px; font-weight: 600; letter-spacing: 1px; }
+        .temp { font-size: 65px; font-weight: 700; margin: -5px 0; text-shadow: 3px 3px 6px rgba(0,0,0,0.2); }
+        .desc { font-size: 20px; text-transform: capitalize; margin-bottom: 25px; font-weight: 400; }
 
-        /* Charts & Map */
-        .chart-container { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 20px; margin: 20px 0; }
-        #weatherMap { height: 200px; border-radius: 20px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.2); }
+        /* Premium Details Grid */
+        .pro-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;
+        }
+        .pro-box {
+            background: rgba(0, 0, 0, 0.15); padding: 15px; border-radius: 15px;
+            font-size: 14px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pro-box span { font-size: 18px; font-weight: 600; margin-top: 5px; }
 
-        /* Forecast */
-        .section-title { font-size: 16px; font-weight: 600; text-align: left; margin: 20px 0 10px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
-        .hourly-container { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; }
-        .hourly-item { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 15px; min-width: 80px; }
+        /* Forecast Sections */
+        .section-title { font-size: 16px; font-weight: 600; text-align: left; margin-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
+        
+        .hourly-container { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; margin-bottom: 25px; }
+        .hourly-container::-webkit-scrollbar { height: 6px; }
+        .hourly-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 10px; }
+        .hourly-item { background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; min-width: 85px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s; }
+        .hourly-item:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); }
+        .hourly-item img { width: 50px; }
+
+        .daily-container { display: flex; flex-direction: column; gap: 12px; }
+        .daily-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 12px 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s; }
+        .daily-item:hover { background: rgba(255, 255, 255, 0.2); transform: translateX(5px); }
+        .daily-item img { width: 45px; }
 
         /* Footer */
         footer { text-align: center; color: white; padding: 20px; margin-top: auto; width: 100%; background: rgba(0,0,0,0.2); }
@@ -91,245 +106,277 @@
         .social-icons a { color: white; margin: 0 10px; text-decoration: none; transition: 0.3s; }
         .social-icons a:hover { color: #ff6b6b; }
 
-        .error { color: #ffcccc; margin-bottom: 10px; display: none; }
+        .error { color: #ffcccc; font-weight: 600; display: none; margin-top: 15px; }
+        .location-badge { font-size: 12px; background: #ff6b6b; padding: 4px 12px; border-radius: 15px; display: inline-block; margin-bottom: 10px; font-weight: 500; }
     </style>
 </head>
 <body class="bg-day-clear" id="body-bg">
 
-    <div class="card">
+    <div class="card" id="main-card">
         <div class="header">
-            <h3>আবহাওয়া প্রো ☁️</h3>
+            <h1>আবহাওয়া ☁️</h1>
+            <!-- সেলসিয়াস / ফারেনহাইট টগল -->
             <div class="unit-toggle">
                 <button id="btn-metric" class="active" onclick="toggleUnit('metric')">°C</button>
                 <button id="btn-imperial" onclick="toggleUnit('imperial')">°F</button>
             </div>
         </div>
-
-        <div class="search-area">
-            <div class="search">
-                <input type="text" id="city-input" placeholder="শহরের নাম লিখুন...">
-                <button onclick="searchByCity()"><i class="fas fa-search"></i></button>
-            </div>
-            <button class="fav-btn" onclick="saveFavorite()"><i class="fas fa-star"></i> প্রিয় তালিকায় যোগ করুন</button>
+        
+        <div class="search">
+            <input type="text" id="city" placeholder="শহরের নাম (যেমন: Dhaka)">
+            <button onclick="searchByCity()">খুঁজুন</button>
         </div>
+        
+        <div class="error" id="error">শহর পাওয়া যায়নি! আবার চেষ্টা করুন।</div>
+        
+        <!-- সুন্দর প্রফেশনাল লোডার -->
+        <div class="loader" id="loading"></div>
+        
+        <div class="weather-info" id="weather">
+            <div class="location-badge" id="auto-badge" style="display:none;">📍 বর্তমান এলাকা</div>
+            
+            <div class="date-time">
+                <div id="live-date">...</div>
+                <div id="live-time" style="font-size: 22px; font-weight: 600;">...</div>
+            </div>
 
-        <div id="favorites" class="favorites-list"></div>
-        <div class="error" id="error-msg">শহর পাওয়া যায়নি!</div>
-        <div class="loader" id="loader"></div>
-
-        <div id="weather-content" style="display: none;">
-            <div id="date-now" style="font-size: 13px; opacity: 0.8;"></div>
-            <h2 id="city-name">--</h2>
-            <img id="weather-icon" class="weather-icon" src="" alt="icon">
-            <div class="temp"><span id="temp-val">0</span>°</div>
-            <p id="weather-desc" style="text-transform: capitalize; margin-bottom: 15px;"></p>
-
-            <!-- 8 Premium Grid Features -->
+            <img id="weather-icon" src="" alt="Icon">
+            <h2 id="city-name">City Name</h2>
+            <div class="temp"><span id="temp-val">0</span><span id="temp-unit">°C</span></div>
+            <div class="desc" id="description">Weather Desc</div>
+            
+            <!-- Premium Details Grid -->
             <div class="pro-grid">
-                <div class="pro-box"><i class="fas fa-droplet"></i>আর্দ্রতা<b id="humidity">0%</b></div>
-                <div class="pro-box"><i class="fas fa-wind"></i>বাতাস<b id="wind">0 km/h</b></div>
-                <div class="pro-box"><i class="fas fa-temperature-high"></i>অনুভূত<b id="feels-like">0°</b></div>
-                <div class="pro-box"><i class="fas fa-smog"></i>বায়ুর মান<b id="aqi">--</b></div>
-                <div class="pro-box"><i class="fas fa-sun"></i>UV ইনডেক্স<b id="uv">--</b></div>
-                <div class="pro-box"><i class="fas fa-cloud-showers-heavy"></i>বৃষ্টির সম্ভাবনা<b id="rain">0%</b></div>
-                <div class="pro-box"><i class="fas fa-eye"></i>দৃশ্যমানতা<b id="visibility">0 km</b></div>
-                <div class="pro-box"><i class="fas fa-arrow-up"></i>সূর্যোদয়<b id="sunrise">--</b></div>
-                <div class="pro-box"><i class="fas fa-arrow-down"></i>সূর্যাস্ত<b id="sunset">--</b></div>
+                <div class="pro-box">💧 আর্দ্রতা <span id="humidity">0%</span></div>
+                <div class="pro-box">💨 বাতাস <span id="wind">0 km/h</span></div>
+                <div class="pro-box">🌡️ অনুভূত <span id="feels-like">0°</span></div>
+                <div class="pro-box">🌅 সূর্যোদয় <span id="sunrise">--:--</span></div>
+                <div class="pro-box">🌇 সূর্যাস্ত <span id="sunset">--:--</span></div>
+                <div class="pro-box">👁️ দৃশ্যমানতা <span id="visibility">0 km</span></div>
             </div>
 
-            <!-- Chart Section -->
-            <div class="section-title">📊 তাপমাত্রার গ্রাফ (২৪ ঘণ্টা)</div>
-            <div class="chart-container">
-                <canvas id="tempChart"></canvas>
-            </div>
-
-            <!-- Map Section -->
-            <div class="section-title">🗺️ এলাকার মানচিত্র</div>
-            <div id="weatherMap"></div>
-
-            <!-- Hourly Forecast -->
-            <div class="section-title">🕒 পরবর্তী পূর্বাভাস</div>
+            <div class="section-title">🕒 আজকের আবহাওয়া</div>
             <div class="hourly-container" id="hourly-forecast"></div>
+
+            <div class="section-title">📅 আগামী ৫ দিন</div>
+            <div class="daily-container" id="daily-forecast"></div>
         </div>
     </div>
 
-    <!-- Footer Section -->
+     <!-- Footer Section -->
     <footer>
-        <p>Created with ❤️ by <b>Your Name</b></p>
+        <p>Created with ❤️ by <b>Noor Alam</b></p>
         <div class="social-icons">
             <a href="https://www.facebook.com/mnalambd09"><i class="fab fa-facebook"></i></a>
             <a href="https://www.instagram.com/mnalambd09/"><i class="fab fa-instagram"></i></a>
-            <a href="https://mnalambd09.github.io/junje-website/"><i class="fab fa-github"></i></a>
+            <a href="https://github.com/mnalambd09"><i class="fab fa-github"></i></a>
             <a href="https://www.linkedin.com/in/noor-alam-ab69b3153/"><i class="fab fa-linkedin"></i></a>
         </div>
-        <p style="font-size: 10px; margin-top: 10px; opacity: 0.6;">© 2024 All Rights Reserved</p>
+        <p style="font-size: 10px; margin-top: 10px; opacity: 0.6;">© 2026 All Rights Reserved</p>
     </footer>
-
     <script>
-        const apiKey = "18d5a3e260f5aa61562ce71dd09da722";
-        let currentUnit = 'metric';
-        let weatherChart = null;
-        let map = null;
-        let marker = null;
+        // এখানে আপনার OpenWeatherMap এর ৩২ অক্ষরের API Key দিন
+        const apiKey = "YOUR_API_KEY_HERE"; 
+        
+        let currentUnit = 'metric'; // ডিফল্ট সেলসিয়াস
+        let lastSearchedCity = ""; 
+        let isAutoTracked = false; 
+        let lastLat = null, lastLon = null;
+        let cityTimezoneOffset = 0; 
+        let clockInterval;
 
-        // Initialize App
-        window.onload = () => {
-            renderFavorites();
-            getAutoLocation();
-        };
+        // Enter চাপলে সার্চ হবে
+        document.getElementById("city").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") searchByCity();
+        });
 
+        // Unit Toggle ফাংশন (°C / °F)
         function toggleUnit(unit) {
+            if(currentUnit === unit) return;
             currentUnit = unit;
-            document.querySelectorAll('.unit-toggle button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${unit}`).classList.add('active');
-            searchByCity();
+            
+            document.getElementById("btn-metric").classList.remove("active");
+            document.getElementById("btn-imperial").classList.remove("active");
+            document.getElementById(`btn-${unit}`).classList.add("active");
+
+            // ইউনিট চেঞ্জ করার সাথে সাথে ডেটা আবার রিফ্রেশ হবে
+            if(isAutoTracked && lastLat !== null) {
+                fetchByLocation(lastLat, lastLon);
+            } else if(lastSearchedCity !== "") {
+                fetchByCityName(lastSearchedCity);
+            } else {
+                fetchByCityName("Dhaka");
+            }
         }
 
-        async function getAutoLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    fetchWeather(pos.coords.latitude, pos.coords.longitude);
-                }, () => fetchByCityName("Dhaka"));
+        // লাইভ ঘড়ি
+        function updateLiveClock() {
+            const now = new Date();
+            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cityTime = new Date(utcTime + (cityTimezoneOffset * 1000));
+            
+            document.getElementById("live-date").innerText = cityTime.toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById("live-time").innerText = cityTime.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        }
+
+        // টাইম স্ট্যাম্প (UTC) কে লোকাল সময়ে রূপান্তর করার ফাংশন (সূর্যোদয়/সূর্যাস্তের জন্য)
+        function formatTimeFromTimestamp(timestamp, timezone) {
+            const date = new Date((timestamp + timezone) * 1000);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' });
+        }
+
+        // ডাইনামিক ব্যাকগ্রাউন্ড সেট করার ফাংশন
+        function setDynamicBackground(weatherMain, iconCode) {
+            const body = document.getElementById("body-bg");
+            const card = document.getElementById("main-card");
+            body.className = ""; // আগের ক্লাস মুছে ফেলা
+            card.style.color = "#ffffff"; // ডিফল্ট টেক্সট কালার
+            
+            const isNight = iconCode.includes('n');
+
+            if(weatherMain === 'Clear') {
+                body.classList.add(isNight ? "bg-night-clear" : "bg-day-clear");
+            } else if(weatherMain === 'Clouds') {
+                body.classList.add(isNight ? "bg-night-clouds" : "bg-clouds");
+            } else if(weatherMain === 'Rain' || weatherMain === 'Drizzle') {
+                body.classList.add("bg-rain");
+            } else if(weatherMain === 'Thunderstorm') {
+                body.classList.add("bg-thunder");
+            } else if(weatherMain === 'Snow') {
+                body.classList.add("bg-snow");
+                card.style.color = "#333"; // বরফের সাদা ব্যাকগ্রাউন্ডে টেক্সট কালো হবে
+            } else {
+                body.classList.add("bg-clouds"); // অন্যান্য (Mist, Fog ইত্যাদি)
             }
+        }
+
+        // মূল ডেটা লোড করার ফাংশন
+        async function fetchWeatherData(currentUrl, forecastUrl, isAuto) {
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("weather").style.display = "none";
+            document.getElementById("error").style.display = "none";
+
+            try {
+                const [currentRes, forecastRes] = await Promise.all([ fetch(currentUrl), fetch(forecastUrl) ]);
+                if (!currentRes.ok || !forecastRes.ok) throw new Error("City not found");
+                
+                const currentData = await currentRes.json();
+                const forecastData = await forecastRes.json();
+
+                // Unit Text Setup
+                const tempSymbol = currentUnit === 'metric' ? '°C' : '°F';
+                const speedUnit = currentUnit === 'metric' ? 'km/h' : 'mph';
+                
+                // Wind speed calculation (Metric APIs gives m/s, so we multiply by 3.6 to get km/h)
+                let windSpeed = currentData.wind.speed;
+                if(currentUnit === 'metric') windSpeed = Math.round(windSpeed * 3.6); 
+
+                // --- Current Weather Setup ---
+                document.getElementById("city-name").innerText = currentData.name;
+                document.getElementById("temp-val").innerText = Math.round(currentData.main.temp);
+                document.getElementById("temp-unit").innerText = tempSymbol;
+                document.getElementById("description").innerText = currentData.weather[0].description;
+                
+                const iconCode = currentData.weather[0].icon;
+                const weatherMain = currentData.weather[0].main;
+                document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+                
+                // Set Dynamic Background
+                setDynamicBackground(weatherMain, iconCode);
+
+                // --- Premium Grid Setup ---
+                document.getElementById("humidity").innerText = currentData.main.humidity + "%";
+                document.getElementById("wind").innerText = windSpeed + " " + speedUnit;
+                document.getElementById("feels-like").innerText = Math.round(currentData.main.feels_like) + tempSymbol;
+                
+                cityTimezoneOffset = currentData.timezone;
+                document.getElementById("sunrise").innerText = formatTimeFromTimestamp(currentData.sys.sunrise, cityTimezoneOffset);
+                document.getElementById("sunset").innerText = formatTimeFromTimestamp(currentData.sys.sunset, cityTimezoneOffset);
+                
+                // Visibility Calculation
+                let visKm = (currentData.visibility / 1000).toFixed(1);
+                document.getElementById("visibility").innerText = currentUnit === 'metric' ? visKm + " km" : (visKm * 0.621371).toFixed(1) + " mi";
+
+                // Live Clock Setup
+                if (clockInterval) clearInterval(clockInterval);
+                updateLiveClock(); 
+                clockInterval = setInterval(updateLiveClock, 1000);
+
+                // --- Hourly Forecast ---
+                const hourlyContainer = document.getElementById("hourly-forecast");
+                hourlyContainer.innerHTML = "";
+                for (let i = 0; i < 8; i++) {
+                    const item = forecastData.list[i];
+                    const timeObj = new Date(item.dt * 1000);
+                    const localTime = new Date(timeObj.getTime() + (timeObj.getTimezoneOffset() * 60000) + (cityTimezoneOffset * 1000));
+                    
+                    hourlyContainer.innerHTML += `
+                        <div class="hourly-item">
+                            <div style="font-size:12px;">${localTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</div>
+                            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="icon">
+                            <div style="font-weight:600;">${Math.round(item.main.temp)}${tempSymbol}</div>
+                        </div>`;
+                }
+
+                // --- Daily Forecast ---
+                const dailyContainer = document.getElementById("daily-forecast");
+                dailyContainer.innerHTML = "";
+                const dailyData = forecastData.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+                dailyData.forEach(item => {
+                    const dayName = new Date(item.dt * 1000).toLocaleDateString('bn-BD', { weekday: 'long' });
+                    dailyContainer.innerHTML += `
+                        <div class="daily-item">
+                            <div style="width: 80px; text-align: left;">${dayName}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="icon">
+                                <span style="font-size:13px; text-transform:capitalize;">${item.weather[0].description}</span>
+                            </div>
+                            <div style="font-weight:bold;">${Math.round(item.main.temp)}${tempSymbol}</div>
+                        </div>`;
+                });
+
+                document.getElementById("auto-badge").style.display = isAuto ? "inline-block" : "none";
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("weather").style.display = "block";
+
+            } catch (error) {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("error").style.display = "block";
+            }
+        }
+
+        // Functions to build URLs and trigger fetch
+        function fetchByCityName(city) {
+            isAutoTracked = false; lastSearchedCity = city;
+            const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${currentUnit}&appid=${apiKey}`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${currentUnit}&appid=${apiKey}`;
+            fetchWeatherData(currentUrl, forecastUrl, false);
+        }
+
+        function fetchByLocation(lat, lon) {
+            isAutoTracked = true; lastLat = lat; lastLon = lon; lastSearchedCity = "";
+            const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${currentUnit}&appid=${apiKey}`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${currentUnit}&appid=${apiKey}`;
+            fetchWeatherData(currentUrl, forecastUrl, true);
         }
 
         function searchByCity() {
-            const city = document.getElementById("city-input").value || "Dhaka";
-            fetchByCityName(city);
+            const city = document.getElementById("city").value;
+            if(city !== "") fetchByCityName(city);
         }
 
-        async function fetchByCityName(city) {
-            try {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${currentUnit}&appid=${apiKey}`);
-                const data = await res.json();
-                if (data.cod !== 200) throw new Error();
-                fetchWeather(data.coord.lat, data.coord.lon);
-            } catch (e) { document.getElementById("error-msg").style.display = "block"; }
-        }
-
-        async function fetchWeather(lat, lon) {
-            document.getElementById("loader").style.display = "block";
-            document.getElementById("weather-content").style.display = "none";
-            document.getElementById("error-msg").style.display = "none";
-
-            try {
-                // Fetch Current, Forecast, and AQI
-                const [curr, fore, aqiRes] = await Promise.all([
-                    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${currentUnit}&appid=${apiKey}`).then(r => r.json()),
-                    fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${currentUnit}&appid=${apiKey}`).then(r => r.json()),
-                    fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`).then(r => r.json())
-                ]);
-
-                updateUI(curr, aqiRes.list[0]);
-                updateForecast(fore);
-                updateChart(fore);
-                updateMap(lat, lon, curr.name);
-                
-                document.getElementById("loader").style.display = "none";
-                document.getElementById("weather-content").style.display = "block";
-            } catch (e) { console.error(e); }
-        }
-
-        function updateUI(data, aqiData) {
-            document.getElementById("city-name").innerText = data.name + ", " + data.sys.country;
-            document.getElementById("temp-val").innerText = Math.round(data.main.temp);
-            document.getElementById("weather-desc").innerText = data.weather[0].description;
-            document.getElementById("humidity").innerText = data.main.humidity + "%";
-            document.getElementById("wind").innerText = data.wind.speed + (currentUnit === 'metric' ? " km/h" : " mph");
-            document.getElementById("feels-like").innerText = Math.round(data.main.feels_like) + "°";
-            document.getElementById("visibility").innerText = (data.visibility / 1000).toFixed(1) + " km";
-            document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
-            
-            // AQI & UV Logic
-            const aqiLevels = ["চমৎকার", "ভালো", "মাঝারি", "খারাপ", "ভয়াবহ"];
-            document.getElementById("aqi").innerText = aqiLevels[aqiData.main.aqi - 1];
-            document.getElementById("uv").innerText = (aqiData.components.no2 / 10).toFixed(1); // Mocking UV from pollution data for free API
-
-            // Times
-            const formatTime = (ts) => new Date((ts + data.timezone) * 1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', timeZone:'UTC'});
-            document.getElementById("sunrise").innerText = formatTime(data.sys.sunrise);
-            document.getElementById("sunset").innerText = formatTime(data.sys.sunset);
-            document.getElementById("date-now").innerText = new Date().toLocaleDateString('bn-BD', {weekday:'long', day:'numeric', month:'long'});
-
-            setBG(data.weather[0].main, data.weather[0].icon);
-        }
-
-        function updateForecast(data) {
-            const container = document.getElementById("hourly-forecast");
-            container.innerHTML = "";
-            document.getElementById("rain").innerText = (data.list[0].pop * 100).toFixed(0) + "%";
-
-            data.list.slice(0, 8).forEach(item => {
-                const time = new Date(item.dt * 1000).getHours();
-                container.innerHTML += `
-                    <div class="hourly-item">
-                        <div>${time}:00</div>
-                        <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" width="40">
-                        <b>${Math.round(item.main.temp)}°</b>
-                    </div>`;
-            });
-        }
-
-        function updateChart(data) {
-            const ctx = document.getElementById('tempChart').getContext('2d');
-            const labels = data.list.slice(0, 8).map(i => new Date(i.dt * 1000).getHours() + ":00");
-            const temps = data.list.slice(0, 8).map(i => i.main.temp);
-
-            if (weatherChart) weatherChart.destroy();
-            weatherChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'তাপমাত্রা',
-                        data: temps,
-                        borderColor: '#ff6b6b',
-                        backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: "#fff" } } } }
-            });
-        }
-
-        function updateMap(lat, lon, name) {
-            if (!map) {
-                map = L.map('weatherMap').setView([lat, lon], 10);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                marker = L.marker([lat, lon]).addTo(map);
-            } else {
-                map.setView([lat, lon], 10);
-                marker.setLatLng([lat, lon]).bindPopup(name).openPopup();
+        function getAutoLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => fetchByLocation(position.coords.latitude, position.coords.longitude),
+                    (error) => fetchByCityName("Dhaka")
+                );
             }
         }
 
-        function setBG(main, icon) {
-            const body = document.getElementById("body-bg");
-            body.className = "";
-            const isNight = icon.includes('n');
-            if(main === 'Clear') body.classList.add(isNight ? "bg-night-clear" : "bg-day-clear");
-            else if(main === 'Clouds') body.classList.add(isNight ? "bg-night-clouds" : "bg-clouds");
-            else if(main === 'Rain') body.classList.add("bg-rain");
-            else body.classList.add("bg-clouds");
-        }
-
-        // Favorites Logic
-        function saveFavorite() {
-            const city = document.getElementById("city-name").innerText.split(',')[0];
-            let favs = JSON.parse(localStorage.getItem("favCities") || "[]");
-            if (!favs.includes(city)) {
-                favs.push(city);
-                localStorage.setItem("favCities", JSON.stringify(favs));
-                renderFavorites();
-            }
-        }
-
-        function renderFavorites() {
-            const container = document.getElementById("favorites");
-            const favs = JSON.parse(localStorage.getItem("favCities") || "[]");
-            container.innerHTML = favs.map(c => `<span class="fav-city" onclick="document.getElementById('city-input').value='${c}'; searchByCity();">${c}</span>`).join("");
-        }
+        // ওয়েবসাইট লোড হলে লোকেশন চাইবে
+        window.addEventListener('load', getAutoLocation);
     </script>
 </body>
 </html>
