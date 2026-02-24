@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>প্রো ওয়েদার অ্যাপ</title>
+    <title>প্রো ওয়েদার অ্যাপ - অ্যাডভান্সড</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -21,27 +21,34 @@
             align-items: center;
             min-height: 100vh;
             background: linear-gradient(135deg, #00feba, #5b548a);
+            padding: 20px 0;
         }
 
         .card {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            width: 90%;
-            max-width: 420px;
+            width: 95%;
+            max-width: 450px;
             text-align: center;
             color: #ffffff;
+            /* স্ক্রল করার জন্য */
+            max-height: 90vh;
+            overflow-y: auto;
         }
+
+        /* কাস্টম স্ক্রলবার */
+        .card::-webkit-scrollbar { width: 5px; }
+        .card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.5); border-radius: 10px; }
 
         .search {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
-            margin-top: 15px;
+            margin-bottom: 15px;
         }
 
         .search input {
@@ -50,7 +57,7 @@
             border-radius: 25px 0 0 25px;
             outline: none;
             width: 70%;
-            font-size: 16px;
+            font-size: 15px;
             background: rgba(255, 255, 255, 0.9);
             color: #333;
         }
@@ -62,69 +69,95 @@
             color: #fff;
             border-radius: 0 25px 25px 0;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             transition: 0.3s;
             font-weight: 600;
         }
 
-        .search button:hover {
-            background: #ff4757;
+        .search button:hover { background: #ff4757; }
+
+        .date-time {
+            font-size: 14px;
+            font-weight: 300;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.1);
+            padding: 8px;
+            border-radius: 10px;
+            display: none;
         }
 
-        .weather-info {
-            display: none; 
-            margin-top: 20px;
-        }
+        .weather-info { display: none; }
 
-        .weather-info h2 {
-            font-size: 30px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
+        .weather-info h2 { font-size: 28px; font-weight: 600; }
+        
         .temp {
-            font-size: 55px;
+            font-size: 50px;
             font-weight: 700;
-            margin: 10px 0;
+            margin: 5px 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .desc {
-            font-size: 20px;
-            text-transform: capitalize;
-            margin-bottom: 25px;
-            font-weight: 300;
-        }
+        .desc { font-size: 18px; text-transform: capitalize; margin-bottom: 20px; }
 
         .details {
             display: flex;
             justify-content: space-between;
-            font-size: 16px;
             background: rgba(0, 0, 0, 0.1);
             padding: 15px;
             border-radius: 15px;
+            margin-bottom: 20px;
         }
 
-        .message {
-            font-weight: 600;
-            display: none;
-            margin-top: 15px;
+        /* Hourly Forecast (Horizontal Scroll) */
+        .section-title { font-size: 16px; font-weight: 600; text-align: left; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
+        
+        .hourly-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hourly-container::-webkit-scrollbar { height: 5px; }
+        .hourly-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 10px; }
+
+        .hourly-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 15px;
+            min-width: 80px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hourly-item img { width: 50px; }
+
+        /* Daily Forecast (Vertical List) */
+        .daily-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .daily-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             font-size: 15px;
         }
 
+        .daily-item img { width: 40px; }
+
+        .message { font-weight: 600; display: none; margin-top: 15px; font-size: 15px; }
         .error { color: #ffcccc; }
         .loading { color: #e1f5fe; }
+        .location-badge { font-size: 11px; background: #1e90ff; padding: 3px 8px; border-radius: 10px; display: inline-block; margin-bottom: 10px; }
 
-        /* Current Location Badge */
-        .location-badge {
-            font-size: 12px;
-            background: #1e90ff;
-            padding: 3px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-bottom: 10px;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -133,17 +166,25 @@
         <h1>আবহাওয়া ☁️</h1>
         
         <div class="search">
+            <!-- Enter চাপলে সার্চ হবে, তার জন্য id দেওয়া হয়েছে -->
             <input type="text" id="city" placeholder="শহরের নাম (যেমন: Dhaka)">
             <button onclick="searchByCity()">খুঁজুন</button>
         </div>
         
         <div class="message error" id="error">শহর পাওয়া যায়নি! আবার চেষ্টা করুন।</div>
-        <div class="message loading" id="loading">লোকেশন খোঁজা হচ্ছে... ⏳</div>
+        <div class="message loading" id="loading">ডেটা লোড হচ্ছে... ⏳</div>
         
+        <!-- লাইভ ঘড়ি এবং তারিখ -->
+        <div class="date-time" id="datetime-box">
+            <div id="live-date">...</div>
+            <div id="live-time" style="font-size: 20px; font-weight: 600;">...</div>
+        </div>
+
         <div class="weather-info" id="weather">
-            <div class="location-badge" id="auto-badge">📍 আপনার বর্তমান এলাকা</div>
-            <br>
-            <img id="weather-icon" src="" alt="Weather Icon" width="120">
+            <div class="location-badge" id="auto-badge" style="display:none;">📍 বর্তমান এলাকা</div>
+            
+            <!-- Current Weather -->
+            <img id="weather-icon" src="" alt="Icon" width="100">
             <h2 id="city-name">City Name</h2>
             <div class="temp"><span id="temp-val">0</span>°C</div>
             <div class="desc" id="description">Weather Desc</div>
@@ -152,44 +193,136 @@
                 <div>💧 আর্দ্রতা:<br> <strong id="humidity">0</strong>%</div>
                 <div>💨 বাতাস:<br> <strong id="wind">0</strong> km/h</div>
             </div>
+
+            <!-- Hourly Forecast (3-hour intervals for 24 hours) -->
+            <div class="section-title">🕒 আজকের আবহাওয়া</div>
+            <div class="hourly-container" id="hourly-forecast">
+                <!-- Data will be injected via JS -->
+            </div>
+
+            <!-- Daily Forecast (Next 5 Days) -->
+            <div class="section-title">📅 আগামী ৫ দিন</div>
+            <div class="daily-container" id="daily-forecast">
+                <!-- Data will be injected via JS -->
+            </div>
         </div>
     </div>
 
     <script>
-        // আপনার OpenWeatherMap API Key এখানে বসান
+        // এখানে আপনার OpenWeatherMap এর ৩২ অক্ষরের API Key টি দিন
         const apiKey = "18d5a3e260f5aa61562ce71dd09da722"; 
+        
+        let cityTimezoneOffset = 0; // শহরের লোকাল টাইম বের করার জন্য
+        let clockInterval; 
 
-        // API থেকে ডেটা এনে ওয়েবসাইটে দেখানোর মূল ফাংশন
-        async function fetchWeather(url, isAutoLocation = false) {
+        // ১. Enter বাটন চাপলে সার্চ করার কোড
+        document.getElementById("city").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchByCity();
+            }
+        });
+
+        // ২. শহরের লোকাল লাইভ ঘড়ি আপডেট করার ফাংশন
+        function updateLiveClock() {
+            const now = new Date();
+            // বর্তমান সময়কে UTC তে কনভার্ট করে তার সাথে শহরের টাইমজোন যোগ করা হচ্ছে
+            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cityTime = new Date(utcTime + (cityTimezoneOffset * 1000));
+
+            // সময় ও তারিখের সুন্দর ফরম্যাট (বাংলায়)
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+
+            document.getElementById("live-date").innerText = cityTime.toLocaleDateString('bn-BD', optionsDate);
+            document.getElementById("live-time").innerText = cityTime.toLocaleTimeString('bn-BD', optionsTime);
+        }
+
+        // ৩. মূল ডেটা নিয়ে আসার ফাংশন
+        async function fetchWeatherData(currentUrl, forecastUrl, isAutoLocation = false) {
             document.getElementById("loading").style.display = "block";
             document.getElementById("weather").style.display = "none";
+            document.getElementById("datetime-box").style.display = "none";
             document.getElementById("error").style.display = "none";
 
             try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("City not found");
-                
-                const data = await response.json();
+                // Current Weather & Forecast একসাথে কল করা
+                const [currentRes, forecastRes] = await Promise.all([
+                    fetch(currentUrl),
+                    fetch(forecastUrl)
+                ]);
 
-                // ডেটা HTML এ সেট করা
-                document.getElementById("city-name").innerText = data.name;
-                document.getElementById("temp-val").innerText = Math.round(data.main.temp);
-                document.getElementById("humidity").innerText = data.main.humidity;
-                document.getElementById("wind").innerText = data.wind.speed;
-                document.getElementById("description").innerText = data.weather[0].description;
+                if (!currentRes.ok || !forecastRes.ok) throw new Error("Data not found");
                 
-                // আইকন সেট করা
-                const iconCode = data.weather[0].icon;
-                document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+                const currentData = await currentRes.json();
+                const forecastData = await forecastRes.json();
 
-                // অটোমেটিক লোকেশন হলে 📍 ব্যাজ দেখাবে
-                if(isAutoLocation){
-                    document.getElementById("auto-badge").style.display = "inline-block";
-                } else {
-                    document.getElementById("auto-badge").style.display = "none";
+                // --- Current Weather Setup ---
+                document.getElementById("city-name").innerText = currentData.name;
+                document.getElementById("temp-val").innerText = Math.round(currentData.main.temp);
+                document.getElementById("humidity").innerText = currentData.main.humidity;
+                document.getElementById("wind").innerText = currentData.wind.speed;
+                document.getElementById("description").innerText = currentData.weather[0].description;
+                document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${currentData.weather[0].icon}@4x.png`;
+
+                // লাইভ টাইমজোন সেট করা
+                cityTimezoneOffset = currentData.timezone;
+                if (clockInterval) clearInterval(clockInterval);
+                updateLiveClock(); // সাথে সাথে একবার আপডেট
+                clockInterval = setInterval(updateLiveClock, 1000); // প্রতি সেকেন্ডে ঘড়ি চলবে
+                document.getElementById("datetime-box").style.display = "block";
+
+                // --- Hourly Forecast Setup (Next 24 Hours / 8 items) ---
+                const hourlyContainer = document.getElementById("hourly-forecast");
+                hourlyContainer.innerHTML = ""; // আগের ডেটা মুছে ফেলা
+                
+                // প্রথম ৮টি ডেটা (৩ ঘণ্টা পরপর ২৪ ঘণ্টা)
+                for (let i = 0; i < 8; i++) {
+                    const item = forecastData.list[i];
+                    const timeObj = new Date(item.dt * 1000);
+                    // লোকাল টাইমে কনভার্ট
+                    const utc = timeObj.getTime() + (timeObj.getTimezoneOffset() * 60000);
+                    const localTime = new Date(utc + (cityTimezoneOffset * 1000));
+                    
+                    const timeString = localTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+                    const temp = Math.round(item.main.temp);
+                    const icon = item.weather[0].icon;
+
+                    hourlyContainer.innerHTML += `
+                        <div class="hourly-item">
+                            <div style="font-size:12px;">${timeString}</div>
+                            <img src="https://openweathermap.org/img/wn/${icon}.png" alt="icon">
+                            <div style="font-weight:600;">${temp}°C</div>
+                        </div>
+                    `;
                 }
 
-                // লোডিং সরিয়ে ওয়েদার ডেটা দেখানো
+                // --- Daily Forecast Setup (Next 5 Days) ---
+                const dailyContainer = document.getElementById("daily-forecast");
+                dailyContainer.innerHTML = "";
+                
+                // প্রতিদিন দুপুর ১২ টার ডেটা ফিল্টার করে ৫ দিনের ডেটা বের করা
+                const dailyData = forecastData.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+                dailyData.forEach(item => {
+                    const dateObj = new Date(item.dt * 1000);
+                    const dayName = dateObj.toLocaleDateString('bn-BD', { weekday: 'long' });
+                    const temp = Math.round(item.main.temp);
+                    const desc = item.weather[0].description;
+                    const icon = item.weather[0].icon;
+
+                    dailyContainer.innerHTML += `
+                        <div class="daily-item">
+                            <div style="width: 80px; text-align: left;">${dayName}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="https://openweathermap.org/img/wn/${icon}.png" alt="icon">
+                                <span style="font-size:12px; text-transform:capitalize;">${desc}</span>
+                            </div>
+                            <div style="font-weight:bold;">${temp}°C</div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById("auto-badge").style.display = isAutoLocation ? "inline-block" : "none";
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("weather").style.display = "block";
 
@@ -199,39 +332,36 @@
             }
         }
 
-        // ১. শহরের নাম দিয়ে খোঁজার ফাংশন (সার্চ বক্স)
+        // Search By City
         function searchByCity() {
             const city = document.getElementById("city").value;
             if(city === "") return;
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-            fetchWeather(url, false);
+            const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+            fetchWeatherData(currentUrl, forecastUrl, false);
         }
 
-        // ২. অটোমেটিক GPS লোকেশন দিয়ে খোঁজার ফাংশন
+        // Auto Location Start
         function getAutoLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // ইউজার লোকেশন পারমিশন দিলে (lat & lon API কাজ করবে)
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-                        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
-                        fetchWeather(url, true);
+                        const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+                        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+                        fetchWeatherData(currentUrl, forecastUrl, true);
                     },
                     (error) => {
-                        // ইউজার লোকেশন পারমিশন না দিলে ডিফল্টভাবে 'Dhaka' এর আবহাওয়া দেখাবে
-                        const url = `https://api.openweathermap.org/data/2.5/weather?q=Dhaka&units=metric&appid=${apiKey}`;
-                        fetchWeather(url, false);
+                        const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=Dhaka&units=metric&appid=${apiKey}`;
+                        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=Dhaka&units=metric&appid=${apiKey}`;
+                        fetchWeatherData(currentUrl, forecastUrl, false);
                     }
                 );
-            } else {
-                alert("আপনার ব্রাউজার লোকেশন সাপোর্ট করে না!");
             }
         }
 
-        // ওয়েবসাইট লোড হওয়ার সাথে সাথেই অটোমেটিক লোকেশন চেক করবে
         window.addEventListener('load', getAutoLocation);
-
     </script>
 </body>
 </html>
