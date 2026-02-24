@@ -154,7 +154,15 @@
 
             <img id="weather-icon" src="" alt="Icon">
             <h2 id="city-name">City Name</h2>
-            <div class="temp"><span id="temp-val">0</span><span id="temp-unit">°C</span></div>
+           <!-- <div class="temp"><span id="temp-val">0</span><span id="temp-unit">°C</span></div> -->
+            <!-- temperature display section -->
+<div class="temp-container">
+    <div class="temp"><span id="temp-val">0</span><span id="temp-unit">°C</span></div>
+    <div class="temp-high-low" style="font-size: 16px; margin-top: 5px; font-weight: 500;">
+        <span style="color: #ff9f43;">↑ সর্বোচ্চ: <span id="temp-max">0</span>°</span>
+        <span style="color: #00d2d3; margin-left: 10px;">↓ সর্বনিম্ন: <span id="temp-min">0</span>°</span>
+    </div>
+</div>
             <div class="desc" id="description">Weather Desc</div>
             
             <!-- Premium Details Grid -->
@@ -287,6 +295,9 @@
                 document.getElementById("city-name").innerText = currentData.name;
                 document.getElementById("temp-val").innerText = Math.round(currentData.main.temp);
                 document.getElementById("temp-unit").innerText = tempSymbol;
+                // বর্তমান দিনের হাই এবং লো তাপমাত্রা সেট করা
+document.getElementById("temp-max").innerText = Math.round(currentData.main.temp_max);
+document.getElementById("temp-min").innerText = Math.round(currentData.main.temp_min);
                 document.getElementById("description").innerText = currentData.weather[0].description;
                 
                 const iconCode = currentData.weather[0].icon;
@@ -344,7 +355,7 @@
                                 <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="icon">
                                 <span style="font-size:13px; text-transform:capitalize;">${item.weather[0].description}</span>
                             </div>
-                            <div style="font-weight:bold;">${Math.round(item.main.temp)}${tempSymbol}</div>
+                            <div style="font-weight:bold;">${Math.round(item.main.temp_max)}° / ${Math.round(item.main.temp_min)}°${tempSymbol}</div>
                         </div>`;
                 });
 
