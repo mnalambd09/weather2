@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সুন্দর আবহাওয়া অ্যাপ</title>
+    <title>প্রো ওয়েদার অ্যাপ</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
@@ -20,11 +20,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* একটি সুন্দর গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
             background: linear-gradient(135deg, #00feba, #5b548a);
         }
 
-        /* Glassmorphism Design */
         .card {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px);
@@ -34,7 +32,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
             width: 90%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
             color: #ffffff;
         }
@@ -47,13 +45,14 @@
         }
 
         .search input {
-            padding: 12px 20px;
+            padding: 12px 15px;
             border: none;
             border-radius: 25px 0 0 25px;
             outline: none;
             width: 70%;
             font-size: 16px;
             background: rgba(255, 255, 255, 0.9);
+            color: #333;
         }
 
         .search button {
@@ -65,6 +64,7 @@
             cursor: pointer;
             font-size: 16px;
             transition: 0.3s;
+            font-weight: 600;
         }
 
         .search button:hover {
@@ -72,12 +72,12 @@
         }
 
         .weather-info {
-            display: none; /* প্রথমে লুকিয়ে থাকবে */
+            display: none; 
             margin-top: 20px;
         }
 
         .weather-info h2 {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 600;
             margin-bottom: 5px;
         }
@@ -105,11 +105,25 @@
             border-radius: 15px;
         }
 
-        .error {
-            color: #ffcccc;
+        .message {
             font-weight: 600;
             display: none;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        .error { color: #ffcccc; }
+        .loading { color: #e1f5fe; }
+
+        /* Current Location Badge */
+        .location-badge {
+            font-size: 12px;
+            background: #1e90ff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 10px;
+            display: none;
         }
     </style>
 </head>
@@ -119,19 +133,20 @@
         <h1>আবহাওয়া ☁️</h1>
         
         <div class="search">
-            <input type="text" id="city" placeholder="শহরের নাম (e.g. Dhaka)">
-            <button onclick="checkWeather()">খুঁজুন</button>
+            <input type="text" id="city" placeholder="শহরের নাম (যেমন: Dhaka)">
+            <button onclick="searchByCity()">খুঁজুন</button>
         </div>
         
-        <div class="error" id="error">শহর পাওয়া যায়নি! আবার চেষ্টা করুন।</div>
+        <div class="message error" id="error">শহর পাওয়া যায়নি! আবার চেষ্টা করুন।</div>
+        <div class="message loading" id="loading">লোকেশন খোঁজা হচ্ছে... ⏳</div>
         
         <div class="weather-info" id="weather">
-            <!-- Weather Icon -->
+            <div class="location-badge" id="auto-badge">📍 আপনার বর্তমান এলাকা</div>
+            <br>
             <img id="weather-icon" src="" alt="Weather Icon" width="120">
-            
-            <h2 id="city-name">Dhaka</h2>
+            <h2 id="city-name">City Name</h2>
             <div class="temp"><span id="temp-val">0</span>°C</div>
-            <div class="desc" id="description">Clear Sky</div>
+            <div class="desc" id="description">Weather Desc</div>
             
             <div class="details">
                 <div>💧 আর্দ্রতা:<br> <strong id="humidity">0</strong>%</div>
@@ -143,20 +158,17 @@
     <script>
         // আপনার OpenWeatherMap API Key এখানে বসান
         const apiKey = "YOUR_API_KEY_HERE"; 
-        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
 
-        async function checkWeather() {
-            const city = document.getElementById("city").value;
-            if(city === "") return;
+        // API থেকে ডেটা এনে ওয়েবসাইটে দেখানোর মূল ফাংশন
+        async function fetchWeather(url, isAutoLocation = false) {
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("weather").style.display = "none";
+            document.getElementById("error").style.display = "none";
 
-            // API থেকে ডেটা নিয়ে আসা
-            const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
-            
-            // যদি শহর না পাওয়া যায় (404 Error)
-            if (response.status == 404) {
-                document.getElementById("error").style.display = "block";
-                document.getElementById("weather").style.display = "none";
-            } else {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("City not found");
+                
                 const data = await response.json();
 
                 // ডেটা HTML এ সেট করা
@@ -166,16 +178,60 @@
                 document.getElementById("wind").innerText = data.wind.speed;
                 document.getElementById("description").innerText = data.weather[0].description;
                 
-                // আবহাওয়ার আইকন সেট করা
+                // আইকন সেট করা
                 const iconCode = data.weather[0].icon;
-                const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
-                document.getElementById("weather-icon").src = iconUrl;
+                document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
 
-                // রেজাল্ট দেখানো
+                // অটোমেটিক লোকেশন হলে 📍 ব্যাজ দেখাবে
+                if(isAutoLocation){
+                    document.getElementById("auto-badge").style.display = "inline-block";
+                } else {
+                    document.getElementById("auto-badge").style.display = "none";
+                }
+
+                // লোডিং সরিয়ে ওয়েদার ডেটা দেখানো
+                document.getElementById("loading").style.display = "none";
                 document.getElementById("weather").style.display = "block";
-                document.getElementById("error").style.display = "none";
+
+            } catch (error) {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("error").style.display = "block";
             }
         }
+
+        // ১. শহরের নাম দিয়ে খোঁজার ফাংশন (সার্চ বক্স)
+        function searchByCity() {
+            const city = document.getElementById("city").value;
+            if(city === "") return;
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+            fetchWeather(url, false);
+        }
+
+        // ২. অটোমেটিক GPS লোকেশন দিয়ে খোঁজার ফাংশন
+        function getAutoLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // ইউজার লোকেশন পারমিশন দিলে (lat & lon API কাজ করবে)
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+                        fetchWeather(url, true);
+                    },
+                    (error) => {
+                        // ইউজার লোকেশন পারমিশন না দিলে ডিফল্টভাবে 'Dhaka' এর আবহাওয়া দেখাবে
+                        const url = `https://api.openweathermap.org/data/2.5/weather?q=Dhaka&units=metric&appid=${apiKey}`;
+                        fetchWeather(url, false);
+                    }
+                );
+            } else {
+                alert("আপনার ব্রাউজার লোকেশন সাপোর্ট করে না!");
+            }
+        }
+
+        // ওয়েবসাইট লোড হওয়ার সাথে সাথেই অটোমেটিক লোকেশন চেক করবে
+        window.addEventListener('load', getAutoLocation);
+
     </script>
 </body>
 </html>
