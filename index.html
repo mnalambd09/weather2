@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সুন্দর আবহাওয়া অ্যাপ</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* একটি সুন্দর গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
+            background: linear-gradient(135deg, #00feba, #5b548a);
+        }
+
+        /* Glassmorphism Design */
+        .card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .search {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+
+        .search input {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px 0 0 25px;
+            outline: none;
+            width: 70%;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search button {
+            padding: 12px 20px;
+            border: none;
+            background: #ff6b6b;
+            color: #fff;
+            border-radius: 0 25px 25px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .search button:hover {
+            background: #ff4757;
+        }
+
+        .weather-info {
+            display: none; /* প্রথমে লুকিয়ে থাকবে */
+            margin-top: 20px;
+        }
+
+        .weather-info h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .temp {
+            font-size: 55px;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .desc {
+            font-size: 20px;
+            text-transform: capitalize;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .error {
+            color: #ffcccc;
+            font-weight: 600;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>আবহাওয়া ☁️</h1>
+        
+        <div class="search">
+            <input type="text" id="city" placeholder="শহরের নাম (e.g. Dhaka)">
+            <button onclick="checkWeather()">খুঁজুন</button>
+        </div>
+        
+        <div class="error" id="error">শহর পাওয়া যায়নি! আবার চেষ্টা করুন।</div>
+        
+        <div class="weather-info" id="weather">
+            <!-- Weather Icon -->
+            <img id="weather-icon" src="" alt="Weather Icon" width="120">
+            
+            <h2 id="city-name">Dhaka</h2>
+            <div class="temp"><span id="temp-val">0</span>°C</div>
+            <div class="desc" id="description">Clear Sky</div>
+            
+            <div class="details">
+                <div>💧 আর্দ্রতা:<br> <strong id="humidity">0</strong>%</div>
+                <div>💨 বাতাস:<br> <strong id="wind">0</strong> km/h</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // আপনার OpenWeatherMap API Key এখানে বসান
+        const apiKey = "YOUR_API_KEY_HERE"; 
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+        async function checkWeather() {
+            const city = document.getElementById("city").value;
+            if(city === "") return;
+
+            // API থেকে ডেটা নিয়ে আসা
+            const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+            
+            // যদি শহর না পাওয়া যায় (404 Error)
+            if (response.status == 404) {
+                document.getElementById("error").style.display = "block";
+                document.getElementById("weather").style.display = "none";
+            } else {
+                const data = await response.json();
+
+                // ডেটা HTML এ সেট করা
+                document.getElementById("city-name").innerText = data.name;
+                document.getElementById("temp-val").innerText = Math.round(data.main.temp);
+                document.getElementById("humidity").innerText = data.main.humidity;
+                document.getElementById("wind").innerText = data.wind.speed;
+                document.getElementById("description").innerText = data.weather[0].description;
+                
+                // আবহাওয়ার আইকন সেট করা
+                const iconCode = data.weather[0].icon;
+                const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+                document.getElementById("weather-icon").src = iconUrl;
+
+                // রেজাল্ট দেখানো
+                document.getElementById("weather").style.display = "block";
+                document.getElementById("error").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
