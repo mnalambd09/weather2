@@ -7,14 +7,24 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome (আইকনের জন্য এটি জরুরি) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
         /* Dynamic Backgrounds */
         body {
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; padding: 20px 0;
-            background-size: cover; background-position: center; transition: background 1s ease;
+            display: flex; 
+            flex-direction: column; /* কার্ড আর ফুটার উপরে-নিচে রাখার জন্য */
+            align-items: center;    /* মাঝখানে রাখার জন্য */
+            justify-content: flex-start;
+            min-height: 100vh; 
+            padding: 40px 0 0 0;
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
+            transition: background 1s ease;
         }
         .bg-day-clear { background: linear-gradient(to right, #56CCF2, #2F80ED); }
         .bg-night-clear { background: linear-gradient(to right, #141E30, #243B55); }
